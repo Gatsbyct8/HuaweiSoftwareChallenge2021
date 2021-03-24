@@ -1,13 +1,7 @@
-'''
-class 
+from Command import Command
+from VirtualMachine import VirtualMachine
+from Server import Server
 
-class Server():
-    def __init__(self,N = 0, ):
-        self.N = 0
-        self.server = []
-        self.M = 0
-        self.virtual = []
-'''
 def readFile(filepath):
     f = open(filepath,'r')
     inputList = f.read().splitlines()
@@ -16,23 +10,52 @@ def readFile(filepath):
 
 def input2format(inputList):
     N = int(inputList[0])
-    server = inputList[1:N+1]
+    #server = inputList[1:N+1]
+    ServerList = [] #存储服务器信息
+    for i in range(1,N+1):
+        snew = inputList[i].replace(" ","")
+        snew = snew[1:-1]
+        s = snew.split(',')
+        serv = Server(s[0],int(s[1]),int(s[2]),int(s[3]),int(s[4]))
+        ServerList.append(serv)
+
     M = int(inputList[N+1])
-    virtualMachine = inputList[N+2:M+N+2]
+    #virtualMachine = inputList[N+2:M+N+2]
+    VMList = [] #存储虚拟机信息
+    for i in range(N+2,M+N+2):
+        snew = inputList[i].replace(" ","")
+        snew = snew[1:-1]
+        s = snew.split(',')
+        vm = VirtualMachine(s[0],int(s[1]),int(s[2]),int(s[3]))
+        VMList.append(vm)
+
     T = int(inputList[M+N+2])
     request = []
     index = M+N+3
+    day = 0
+    CommandList = []  #存储T天的命令信息 
+    CommandDayList = []
     while index < len(inputList):
         R = int(inputList[index])
-        requestDay = inputList[index+1:index+R+1]
-        request.append([R,requestDay])
+        #requestDay = inputList[index+1:index+R+1]
+        for i in range(index+1, index+R+1):
+            snew = inputList[i].replace(" ","")
+            snew = snew[1:-1]
+            s = snew.split(',')
+            if len(s) == 2:
+                command = Command(s[0],"",int(s[1]))
+            else:
+                command = Command(s[0],s[1],int(s[2]))
+            CommandDayList.append(command)
+        CommandList.append(CommandDayList)
+        #request.append([R,requestDay])
         index = index + R + 1
-    return N, server, M, virtualMachine, T, request
+    return ServerList, VMList, CommandList # 返回服务器、虚拟机、命令信息
 
 if __name__ == '__main__':
     filepath = 'training-1.txt'
     inputList = readFile(filepath)
-    N, server, M, virtualMachine, T, request = input2format(inputList)
-    print(request[0])
+    ServerList, VMList, CommandList = input2format(inputList)
+    print(ServerList[0].stype)
     
     

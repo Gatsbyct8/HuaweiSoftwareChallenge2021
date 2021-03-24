@@ -1,7 +1,7 @@
 from readfile import readFile, input2format
 
 
-class Optimization()
+class Optimization:
     def __init__(self, N=0, server=[], M=0, virtualMachine=[], T=0, request=[]):
         self.N = N
         self.server = server
