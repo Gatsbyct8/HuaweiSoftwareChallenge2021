@@ -1,7 +1,7 @@
 class VirtualMachine():
-    def __init__(self, productID=0, cpuCore = 0, ram = 0, deploy = 0):
-        self.productId = 
-        self.cpuCore = 
-        self.ram = 
-        self.deploy = 
-        self.usrId = 
+    def __init__(self, productID=[], cpuCore = [], ram = [], deploy = [], usrId = []):
+        self.productId = productID
+        self.cpuCore = cpuCore
+        self.ram = ram
+        self.deploy = deploy
+        self.usrId = usrId
