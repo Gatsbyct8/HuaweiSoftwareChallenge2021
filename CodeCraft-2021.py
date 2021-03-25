@@ -39,6 +39,7 @@ class Optimization:
                     halfram = ram / 2
 
                     availableFlag = False  #判断是否在已有服务器能部署的下
+                    exceedResourceFlag = True #判断是否超过所有服务器容量
                     if bothFlag:  #A,B双节点部署
                         for key,value in self.alreadyBuyServerInfo.items(): #获取服务器ID,服务器参数
                             # 如果空间足够，能够部署
@@ -58,6 +59,7 @@ class Optimization:
                             continue
                         #服务器空间不足，需要购买
                         #查询服务器产品列表
+                        # flag = False
                         for k in range(len(ServerList)):
                             server = copy.deepcopy(ServerList[k])
                             #如果当前服务器满足
@@ -73,6 +75,7 @@ class Optimization:
                                 buyHashToday[cnt] = k
                                 if k not in buyOrderToday:
                                     buyOrderToday.append(k)
+                                    exceedResourceFlag = False
                                 if not numsBuyToday.get(k): 
                                     numsBuyToday[k] = 0
                                 numsBuyToday[k] += 1
@@ -115,6 +118,7 @@ class Optimization:
                                 buyHashToday[cnt] = k #购买的服务器id 对应 第k个服务型号
                                 if k not in buyOrderToday:
                                     buyOrderToday.append(k)
+                                    exceedResourceFlag = False
                                 if not numsBuyToday.get(k): #第k个型号的服务器没有买
                                     numsBuyToday[k] = 0 #初始化
                                 numsBuyToday[k] += 1
@@ -124,6 +128,8 @@ class Optimization:
                                 self.vmID2sid[tempCommand.vmId] = cnt
                                 cnt += 1
                                 break
+                    if exceedResourceFlag:
+                        return 0 #单双部署如果都不行，直接返回0
                 # 'del'操作
                 else:     
                     delVmId = tempCommand.vmId
