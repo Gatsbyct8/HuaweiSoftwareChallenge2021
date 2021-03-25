@@ -18,7 +18,7 @@ def input2format(inputList):
         s = snew.split(',')
         serv = Server(s[0],int(s[1]),int(s[2]),int(s[3]),int(s[4]))
         ServerList.append(serv)
-
+    ServerList.sort()
     M = int(inputList[N+1])
     #virtualMachine = inputList[N+2:M+N+2]
     VMList = {} #存储虚拟机信息
@@ -64,6 +64,7 @@ def input2formatstd():
         s = snew.split(',')
         serv = Server(s[0],int(s[1]),int(s[2]),int(s[3]),int(s[4]))
         ServerList.append(serv)
+    ServerList.sort()
 
     M = int(input())
     #virtualMachine = inputList[N+2:M+N+2]
@@ -75,7 +76,7 @@ def input2formatstd():
         s = snew.split(',')
         vm = VirtualMachine(s[0],int(s[1]),int(s[2]),int(s[3]))
         VMList[vm.vmType] = vm
-
+    
     T = int(input())
     request = []
     day = 0
@@ -101,9 +102,10 @@ def input2formatstd():
     return ServerList, VMList, CommandList # 返回服务器、虚拟机、命令信息
     
 if __name__ == '__main__':
-    #filepath = 'training-1.txt'
-    #inputList = readFile(filepath)
-    ServerList, VMList, CommandList = input2formatstd()
+    filepath = 'training-1.txt'
+    inputList = readFile(filepath)
+    ServerList, VMList, CommandList = input2format(inputList)
+    #ServerList, VMList, CommandList = input2formatstd()
     print(ServerList[0].stype)
     
     

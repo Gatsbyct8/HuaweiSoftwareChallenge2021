@@ -1,6 +1,7 @@
 from readfile import readFile, input2format , input2formatstd
 import copy
 import sys
+import time
 
 class Optimization:
     def __init__(self,ServerList, VMList, CommandList):
@@ -30,8 +31,6 @@ class Optimization:
                 # add
                 if tempCommand.commandType == 'add':
                     self.vmID2vmType[tempCommand.vmId] = tempCommand.vmType #建立 虚拟机节点和型号对应 <vmid, vmType>
-                    if tempCommand.vmId == 307089369:
-                        print("haoye")
                     bothFlag = VMList[tempCommand.vmType].deploy #按该虚拟机节点部署
                     cpuCore = VMList[tempCommand.vmType].cpuCore
                     ram = VMList[tempCommand.vmType].ram
@@ -42,7 +41,7 @@ class Optimization:
                             # 如果空间足够，能够部署
                             if value.availableCpuCoreA >= cpuCore / 2 and value.availableRamA >= ram / 2 \
                                 and value.availableCpuCoreB >= cpuCore / 2 and value.availableRamB >= ram / 2:
-                                tempStr = '(' + str(key) + ')'
+                                tempStr = '(' + str(key) + ')\n'
                                 tempRes.append(tempStr)
                                 value.availableCpuCoreA -= cpuCore / 2
                                 value.availableRamA -= ram / 2
@@ -74,7 +73,7 @@ class Optimization:
                                 if not numsBuyToday.get(k): 
                                     numsBuyToday[k] = 0
                                 numsBuyToday[k] += 1
-                                tempStr = '(' + str(cnt) + ')'
+                                tempStr = '(' + str(cnt) + ')\n'
                                 tempRes.append(tempStr)
                                 self.vmID2sid[tempCommand.vmId] = cnt 
                                 cnt += 1 #当前服务器ID增加1，给之后新的服务器 
@@ -84,7 +83,7 @@ class Optimization:
                         for key,value in self.alreadyBuyServerInfo.items():
                             # 如果A节点有空间
                             if value.availableCpuCoreA >= cpuCore and value.availableRamA >= ram :
-                                tempStr = '(' + str(key) + ", A)"
+                                tempStr = '(' + str(key) + ", A)\n"
                                 tempRes.append(tempStr)
                                 value.availableCpuCoreA -= cpuCore
                                 value.availableRamA -= ram
@@ -93,7 +92,7 @@ class Optimization:
                                 self.vmID2sid[tempCommand.vmId] = key
                                 break
                             elif value.availableCpuCoreB >= cpuCore and value.availableRamB >= ram :
-                                tempStr = '(' + str(key) + ", B)"
+                                tempStr = '(' + str(key) + ", B)\n"
                                 tempRes.append(tempStr)
                                 value.availableCpuCoreB -= cpuCore
                                 value.availableRamB -= ram
@@ -116,7 +115,7 @@ class Optimization:
                                 if not numsBuyToday.get(k): #第k个型号的服务器没有买
                                     numsBuyToday[k] = 0 #初始化
                                 numsBuyToday[k] += 1
-                                tempStr = '(' + str(cnt) + ", A)"
+                                tempStr = '(' + str(cnt) + ", A)\n"
                                 tempRes.append(tempStr)
                                 self.vmID2End[tempCommand.vmId] = 1
                                 self.vmID2sid[tempCommand.vmId] = cnt
@@ -125,8 +124,6 @@ class Optimization:
                 # 'del'操作
                 else:     
                     delVmId = tempCommand.vmId
-                    if tempCommand.vmId == 307089369:
-                        print("haoye")
                     serverId = self.vmID2sid[delVmId]
                     # 对应服务器ID资源恢复
                     tempVmInfo = self.VMList[self.vmID2vmType[delVmId]]
@@ -180,27 +177,32 @@ class Optimization:
                 tempStr = '(' + str(Nmap[tNum]) + tres[t:]
                 resForRequest.append(tempStr)
             # purchase输出信息
-            res.append("(purchase, " + str(len(buyOrderToday)) + ")")
+            res.append("(purchase, " + str(len(buyOrderToday)) + ")\n")
             for j in range(0, len(buyOrderToday)):
-                tempStr = "(" + self.ServerList[buyOrderToday[j]].stype + ", " + str(numsBuyToday[buyOrderToday[j]]) + ")"
+                tempStr = "(" + self.ServerList[buyOrderToday[j]].stype + ", " + str(numsBuyToday[buyOrderToday[j]]) + ")\n"
                 res.append(tempStr)
             
             # migration输出信息
-            res.append("(migration, 0)")
+            res.append("(migration, 0)\n")
             for tres in resForRequest:
                 res.append(tres)
-            for r in res:
-                print(r)
-                sys.stdout.flush()
+        for r in res:
+            sys.stdout.write(r)
+            sys.stdout.flush()
+        #f = open('res.txt','a')
+        #f.writelines(res)
 
         
 if __name__ == "__main__":
+    start = time.time()
     filepath = 'training-1.txt'
     inputList = readFile(filepath)
     ServerList, VMList, CommandList = input2format(inputList)
     #ServerList, VMList, CommandList = input2formatstd()
     op = Optimization(ServerList, VMList, CommandList)
     op.optimization()
+    end = time.time()
+    print(end-start)
     
 
     

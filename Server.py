@@ -34,7 +34,15 @@ class Server:
         self.availableCpuCoreB -= VM.cpuCore / 2
         self.availableRamB -= VM.ram / 2
 
-    #删除一个用户的虚拟机时
+    #服务器性价比排序
+    def __lt__(self, rhs):
+        factor1 = self.hardWareCost / (self.availableCpuCoreA + self.availableCpuCoreB) + \
+                self.hardWareCost / (self.availableRamA + self.availableRamB) + self.energyCost
+        factor2 = rhs.hardWareCost / (rhs.availableCpuCoreA + rhs.availableCpuCoreB) + \
+                rhs.hardWareCost / (rhs.availableRamA + rhs.availableRamB) + rhs.energyCost
+        return factor1 < factor2
+    
+
     
 
 
