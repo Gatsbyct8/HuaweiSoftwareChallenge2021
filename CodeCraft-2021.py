@@ -152,8 +152,6 @@ class Optimization:
                                 self.vmID2sid[tempCommand.vmId] = cnt
                                 cnt += 1
                                 break
-                    if exceedResourceFlag:
-                        return 0 #单双部署如果都不行，直接返回0
                 # 'del'操作
                 else:     
                     delVmId = tempCommand.vmId
