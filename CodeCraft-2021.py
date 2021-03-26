@@ -65,7 +65,6 @@ class Optimization:
                             continue
                         #服务器空间不足，需要购买
                         #查询服务器产品列表
-                        # flag = False
                         for k in range(len(ServerList)):
                             server = ServerList[k]
                             #如果当前服务器满足
@@ -87,7 +86,6 @@ class Optimization:
                                 buyHashToday[cnt] = k
                                 if k not in buyOrderToday:
                                     buyOrderToday.append(k)
-                                    exceedResourceFlag = False
                                 if not numsBuyToday.get(k): 
                                     numsBuyToday[k] = 0
                                 numsBuyToday[k] += 1
@@ -142,7 +140,6 @@ class Optimization:
                                 buyHashToday[cnt] = k #购买的服务器id 对应 第k个服务型号
                                 if k not in buyOrderToday:
                                     buyOrderToday.append(k)
-                                    exceedResourceFlag = False
                                 if not numsBuyToday.get(k): #第k个型号的服务器没有买
                                     numsBuyToday[k] = 0 #初始化
                                 numsBuyToday[k] += 1
