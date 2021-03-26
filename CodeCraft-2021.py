@@ -8,7 +8,6 @@ class Optimization:
         self.ServerList = ServerList
         self.VMList = VMList
         self.CommandList = CommandList
-        self.totalResources = {}  #当天的总资源
         self.alreadyBuyServerInfo = {}  #已经买了的服务器 <id,server>
         self.vmID2vmType = {}  # 虚拟机ID对虚拟机型号 <vmid, vmtype>
         self.vmID2sid = {}  #虚拟机ID与服务器ID <vmid, serverid>
@@ -18,7 +17,7 @@ class Optimization:
         cnt = 0
         res = []
         days = len(CommandList)
-        start = time.time()
+        #start = time.time()
         for i in range(days):
             numsBuyToday = {}  #每天购买 <stype, nums>
             buyHashToday = {}  #申请编号和当天服务器编号 <id, sid>
@@ -31,15 +30,17 @@ class Optimization:
                 
                 # add
                 if tempCommand.commandType == 'add':
+                    
                     self.vmID2vmType[tempCommand.vmId] = tempCommand.vmType #建立 虚拟机节点和型号对应 <vmid, vmType>
                     bothFlag = VMList[tempCommand.vmType].deploy #按该虚拟机节点部署
                     cpuCore = VMList[tempCommand.vmType].cpuCore
                     ram = VMList[tempCommand.vmType].ram
-                    halfcpuCore = cpuCore / 2
-                    halfram = ram / 2
+                    halfcpuCore = int(cpuCore / 2)
+                    halfram = int(ram / 2)
+                    #print(cpuCore)
 
                     availableFlag = False  #判断是否在已有服务器能部署的下
-                    if bothFlag:  #A,B双节点部署
+                    if bothFlag == 1:  #A,B双节点部署
                         for key,value in self.alreadyBuyServerInfo.items(): #获取服务器ID,服务器参数
                             # 如果空间足够，能够部署
                             if value.availableCpuCoreA >= halfcpuCore and value.availableRamA >= halfram \
@@ -50,6 +51,12 @@ class Optimization:
                                 value.availableRamA -= halfram
                                 value.availableCpuCoreB -= halfcpuCore
                                 value.availableRamB -= halfram
+                                #print("S:",key)
+                                #print("CpuAchanged:",value.availableCpuCoreA)
+                                #print("ramAchanged:",value.availableRamA)
+                                #print("CpuBchanged:",value.availableCpuCoreB)
+                                #print("ramBchanged:",value.availableRamB)
+                                #print("----------------------")
                                 availableFlag = True
                                 self.vmID2sid[tempCommand.vmId] = key
                                 break
@@ -59,17 +66,23 @@ class Optimization:
                         #服务器空间不足，需要购买
                         #查询服务器产品列表
                         for k in range(len(ServerList)):
-                            server = copy.deepcopy(ServerList[k])
+                            server = ServerList[k]
                             #如果当前服务器满足
                             if server.availableCpuCoreA >= halfcpuCore and server.availableRamA >= halfram \
                                 and server.availableCpuCoreB >= halfcpuCore  and server.availableRamB >= halfram:
                                 buyCntToday += 1 #当天购买数量加1
                                 # 当前cnt为空余id，给买的server
-                                self.alreadyBuyServerInfo[cnt] = server    # <id, server>
+                                self.alreadyBuyServerInfo[cnt] = copy.deepcopy(server)     # <id, server>
                                 self.alreadyBuyServerInfo[cnt].availableCpuCoreA -= halfcpuCore
                                 self.alreadyBuyServerInfo[cnt].availableRamA -= halfram
-                                self.alreadyBuyServerInfo[cnt].availableCpuCoreA -= halfcpuCore
+                                self.alreadyBuyServerInfo[cnt].availableCpuCoreB -= halfcpuCore
                                 self.alreadyBuyServerInfo[cnt].availableRamB -= halfram
+                                #print("S:",cnt)
+                                #print("AB:A",self.alreadyBuyServerInfo[cnt].availableCpuCoreA)
+                                #print("AB:A",self.alreadyBuyServerInfo[cnt].availableRamA)
+                                #print("AB:B",self.alreadyBuyServerInfo[cnt].availableCpuCoreB)
+                                #print("AB:B",self.alreadyBuyServerInfo[cnt].availableRamB)
+                                #print("----------------------")
                                 buyHashToday[cnt] = k
                                 if k not in buyOrderToday:
                                     buyOrderToday.append(k)
@@ -90,6 +103,10 @@ class Optimization:
                                 tempRes.append(tempStr)
                                 value.availableCpuCoreA -= cpuCore
                                 value.availableRamA -= ram
+                                #print("S:",key)
+                                #print("CpuAchanged:",value.availableCpuCoreA)
+                                #print("ramAchanged:",value.availableRamA)
+                                #print("----------------------")
                                 availableFlag = True # 能够部署，不需要购买
                                 self.vmID2End[tempCommand.vmId] = 1  #虚拟机部署在A节点  <vmID, 1>
                                 self.vmID2sid[tempCommand.vmId] = key
@@ -99,6 +116,10 @@ class Optimization:
                                 tempRes.append(tempStr)
                                 value.availableCpuCoreB -= cpuCore
                                 value.availableRamB -= ram
+                                #print("S:",key)
+                                #print("CpuBchanged:",value.availableCpuCoreB)
+                                #print("ramBchanged:",value.availableRamB)
+                                #print("----------------------")
                                 availableFlag = True # 能够部署，不需要购买
                                 self.vmID2End[tempCommand.vmId] = 2  #虚拟机部署在B节点  <vmID, 2>
                                 self.vmID2sid[tempCommand.vmId] = key
@@ -112,6 +133,10 @@ class Optimization:
                                 self.alreadyBuyServerInfo[cnt] = copy.deepcopy(ServerList[k])
                                 self.alreadyBuyServerInfo[cnt].availableCpuCoreA -= cpuCore
                                 self.alreadyBuyServerInfo[cnt].availableRamA -= ram
+                                #print("S:",cnt)
+                                #print("AB:",self.alreadyBuyServerInfo[cnt].availableCpuCoreA)
+                                #print("AB:",self.alreadyBuyServerInfo[cnt].availableRamA)
+                                #print("----------------------")
                                 buyHashToday[cnt] = k #购买的服务器id 对应 第k个服务型号
                                 if k not in buyOrderToday:
                                     buyOrderToday.append(k)
@@ -136,9 +161,10 @@ class Optimization:
                     if tempVmInfo.deploy:
                         self.alreadyBuyServerInfo[serverId].availableCpuCoreA += temphalfcpuCore
                         self.alreadyBuyServerInfo[serverId].availableRamA += temphalfram
-                        self.alreadyBuyServerInfo[serverId].availableCpuCoreA += temphalfcpuCore
+                        self.alreadyBuyServerInfo[serverId].availableCpuCoreB += temphalfcpuCore
                         self.alreadyBuyServerInfo[serverId].availableRamB += temphalfram
                         self.vmID2vmType.pop(delVmId)
+                        self.vmID2sid.pop(delVmId)
                     else:
                         # 部署在节点A
                         if self.vmID2End[delVmId] == 1:
@@ -149,6 +175,8 @@ class Optimization:
                             self.alreadyBuyServerInfo[serverId].availableRamB += tempVmInfo.ram
                         self.vmID2vmType.pop(delVmId)
                         self.vmID2End.pop(delVmId)
+                        self.vmID2sid.pop(delVmId)
+            
             tCnt = sIndex = len(self.alreadyBuyServerInfo) - buyCntToday;
             tempServerInfos = {}
             Nmap = {}
@@ -166,7 +194,8 @@ class Optimization:
             for key,value in self.vmID2sid.items(): #虚拟机对应的服务器ID需要改变
                 if value < sIndex:
                     continue
-                value = Nmap[value]
+                self.vmID2sid[key] = Nmap[value]
+            
             
             resForRequest = []
             for tres in tempRes:
@@ -186,30 +215,37 @@ class Optimization:
             for j in range(0, len(buyOrderToday)):
                 tempStr = "(" + self.ServerList[buyOrderToday[j]].stype + ", " + str(numsBuyToday[buyOrderToday[j]]) + ")\n"
                 res.append(tempStr)
+            #print(buyCntToday)
             
             # migration输出信息
             res.append("(migration, 0)\n")
             for tres in resForRequest:
                 res.append(tres)
+        #pstarttime = time.time()
+        
         for r in res:
             sys.stdout.write(r)
             sys.stdout.flush()
-        end = time.time()
-        print("循环体时间消耗:",end - start)
-        #f = open('res.txt','a')
+            
+        #pendtime =time.time()
+        #end = time.time()
+        #print("打印时间消耗:",pendtime - pstarttime)
+        #print("循环体时间消耗:",end - start)
+        #f = open('res.txt','w')
         #f.writelines(res)
+        #print(cnt)
 
         
 if __name__ == "__main__":
-    start = time.time()
-    filepath = 'training-1.txt'
-    inputList = readFile(filepath)
-    ServerList, VMList, CommandList = input2format(inputList)
-    #ServerList, VMList, CommandList = input2formatstd()
+    #start = time.time()
+    #filepath = 'training-1.txt'
+    #inputList = readFile(filepath)
+    #ServerList, VMList, CommandList = input2format(inputList)
+    ServerList, VMList, CommandList = input2formatstd()
     op = Optimization(ServerList, VMList, CommandList)
     op.optimization()
-    end = time.time()
-    print(end-start)
+    #end = time.time()
+    #print(end-start)
     
 
     

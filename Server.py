@@ -8,10 +8,10 @@ class Server:
         self.nodeA_usr = []
         self.nodeB_usr = []
         self.sid = 0
-        self.availableCpuCoreA = self.cpuCore / 2 #A剩余核心数
-        self.availableRamA = self.ram / 2       #A剩余内存
-        self.availableCpuCoreB = self.cpuCore / 2 #B剩余核心数
-        self.availableRamB = self.ram / 2       #B剩余内存
+        self.availableCpuCoreA = int(self.cpuCore / 2) #A剩余核心数
+        self.availableRamA = int(self.ram / 2)       #A剩余内存
+        self.availableCpuCoreB = int(self.cpuCore / 2) #B剩余核心数
+        self.availableRamB = int(self.ram / 2)       #B剩余内存
 
     
     #当在节点A或B中添加一个用户申请虚拟机时
@@ -35,12 +35,20 @@ class Server:
         self.availableRamB -= VM.ram / 2
 
     #服务器性价比排序
+    
     def __lt__(self, rhs):
         factor1 = self.hardWareCost / (self.availableCpuCoreA + self.availableCpuCoreB) + \
                 self.hardWareCost / (self.availableRamA + self.availableRamB) + self.energyCost
         factor2 = rhs.hardWareCost / (rhs.availableCpuCoreA + rhs.availableCpuCoreB) + \
                 rhs.hardWareCost / (rhs.availableRamA + rhs.availableRamB) + rhs.energyCost
-        return factor1 < factor2
+        return int(factor1) < int(factor2)
+    
+    '''
+    def __lt__(self, rhs):
+        factor1 = self.cpuCore + self.ram 
+        factor2 = rhs.cpuCore +  rhs.ram 
+        return factor1 > factor2
+    '''
     
 
     
